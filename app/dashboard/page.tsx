@@ -1,8 +1,9 @@
-import { Profile, columns } from "./columns"
+import { Profile, columns } from "../../components/ui/columns"
 import { DataTable } from "./data-table"
 import MembershipChart from "./chart"
+import StatisticCard from "./statistics"
 
-async function getData(): Promise<Profile[]> {
+ export async function getData(): Promise<Profile[]> {
   // Fetch data from your API here.
   return [
     {
@@ -163,7 +164,12 @@ export default async function DemoPage() {
 
   return (
     <div className="container mx-auto py-10">
+      <StatisticCard />
+      <div>
       <MembershipChart />
+        
+      </div>
+      
       <DataTable columns={columns} data={data} />
     </div>
   )
