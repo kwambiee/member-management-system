@@ -4,6 +4,7 @@ import {useState} from "react"
 
 import {
     ColumnDef,
+    ColumnFiltersState,
     SortingState,
     PaginationState,
     flexRender,
@@ -11,6 +12,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
+    getFilteredRowModel,
 } from "@tanstack/react-table"
 
 import {
@@ -24,6 +26,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import Pagination from "@/components/ui/pagination"
+import { Input } from "@/components/ui/input"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -37,8 +40,9 @@ export function DataTable<TData, TValue>({
     const [sorting, setSorting] = useState<SortingState>([])
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
-        pageSize: 10,
+        pageSize: 5,
     })
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
 
     const table = useReactTable({
@@ -49,6 +53,8 @@ export function DataTable<TData, TValue>({
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
+        onColumnFiltersChange: setColumnFilters,
+        getFilteredRowModel: getFilteredRowModel(),
         state: {
           sorting,
           pagination,
@@ -56,7 +62,25 @@ export function DataTable<TData, TValue>({
       })
 
   return (
-    <div className="rounded-md border">
+    <div>
+      {/* search/filter input */}
+      <div className="flex justify-between items-center py-4 gap-x-2 w-1/2">
+        <Input
+          placeholder="Search..."
+          onChange={(e) => {
+            table.setGlobalFilter(e.target.value)
+          }}
+        />
+        <Button
+          onClick={() => {
+            table.setGlobalFilter("")
+          }}
+        >
+          Clear
+        </Button>
+      </div>
+      {/* Table */}
+      <div className="rounded-md border">
       <Table >
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -100,6 +124,9 @@ export function DataTable<TData, TValue>({
         </TableBody>
       </Table>
       <Pagination table={table} />
+      </div>
+
     </div>
+    
   )
 }

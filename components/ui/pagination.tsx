@@ -3,7 +3,7 @@ import { Button } from "./button";
 const Pagination = ({ table }: { table: any }) => {
   const totalPages = table.getPageCount(); // Total number of pages
   const currentPage = table.getState().pagination.pageIndex + 1; // Current page (1-based index)
-  const pageSizeOptions = [10, 20, 30, 40, 50]; // Page size options
+  const pageSizeOptions = [5,10,15 ]; // Page size options
 
   // Generate page numbers with ellipsis logic
   const generatePageNumbers = () => {
