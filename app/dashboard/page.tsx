@@ -2,6 +2,7 @@ import { Profile, columns } from "../../components/ui/columns"
 import { DataTable } from "./data-table"
 import MembershipChart from "./chart"
 import StatisticCard from "./statistics"
+import ActivityLogs from "./activity-logs"
 
  export async function getData(): Promise<Profile[]> {
   // Fetch data from your API here.
@@ -165,10 +166,14 @@ export default async function DemoPage() {
   return (
     <div className="container mx-auto py-10">
       <StatisticCard />
-      <div>
-      <MembershipChart />
-        
-      </div>
+      <div className="flex gap-x-4">
+  <div className="w-3/4">
+    <MembershipChart />
+  </div>
+  <div className="w-1/4">
+    <ActivityLogs />
+  </div>
+</div>
       
       <DataTable columns={columns} data={data} />
     </div>
