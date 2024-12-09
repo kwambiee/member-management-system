@@ -169,6 +169,7 @@ const Dashboard = async() => {
   const data = await getData();
 
   const { isAuthenticated } = useAuth();
+  console.log(isAuthenticated, "isAuthenticated");
   const router = useRouter();
 
   useEffect(() => {

@@ -7,17 +7,14 @@ import { useRouter } from "next/navigation";
 interface  AuthContextType {
     userId: string | null;
     token: string | null;
-    loading: boolean;
-    registerUser: (userId: string, token: string) => Promise<void>;
-    loginUser: (userId: string, token: string) => Promise<void>;
-    logoutUser: () => Promise<void>;
     isAuthenticated: boolean;
+    registerUser: (userId: string, token: string) => void;
+    loginUser: (userId: string, token: string) => void;
+    logoutUser: () => void;
 }
 
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
-
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [userId, setUserId] = useState<any>(null);
@@ -40,17 +37,17 @@ const router = useRouter();
 
  
    
-    const registerUser = async (userId: string, token: string): Promise<void> => {
+    const registerUser =  (userId: string, token: string) => {
         setUserId(userId);
         setToken(token);
         setIsAuthenticated(true);
         localStorage.setItem("token", token);
         localStorage.setItem("userId", userId);
-        router.push("/dashboard");
+        router.push("/profile");
     }
     
 
-   const loginUser = async (userId: string, token: string): Promise<void> =>{
+   const loginUser =  (userId: string, token: string) =>{
     setUserId(userId);
         setToken(token);
         setIsAuthenticated(true);
@@ -60,7 +57,7 @@ const router = useRouter();
    }
 
 
-        const logoutUser = async (): Promise<void> =>{
+        const logoutUser =  ()=>{
             setUserId(null);
             setToken(null);
             setIsAuthenticated(false);
@@ -71,7 +68,7 @@ const router = useRouter();
         
 
         return (
-        <AuthContext.Provider value={{ userId, token, isAuthenticated,loading, registerUser, loginUser, logoutUser }}>
+        <AuthContext.Provider value={{ userId, token, isAuthenticated, registerUser, loginUser, logoutUser }}>
             {children}
         </AuthContext.Provider>
     );
@@ -84,7 +81,7 @@ export const useAuth = () => {
         throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
-}
+};
 
 // [context.userId, context.token, context.loading,context.isAuthenticated, context.registerUser, context.loginUser, context.logoutUser];
 
