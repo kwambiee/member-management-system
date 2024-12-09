@@ -1,5 +1,5 @@
 "use client"
-
+import { useState } from "react";                             
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -14,26 +14,25 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+
+import { useAuth } from "@/context"
 import { Label } from "@/components/ui/label"
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum 8 characters, at least one letter and one number
+// const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum 8 characters, at least one letter and one number
 
 
 const signUpFormSchema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters long"),
-  email: z.string().min(6).regex(emailRegex, "Invalid email address"),
-  password: z.string().min(8).regex(passwordRegex, "Password must be at least 8 characters long and contain at least one letter and one number"),
+  email: z.string().min(6),
+  password: z.string().min(8),
 });
 
-const signInFormSchema = z.object({
-    email: z.string().min(6).regex(emailRegex, "Invalid email address"),
-    password: z.string().min(8).regex(passwordRegex, "Password must be at least 8 characters long and contain at least one letter and one number"),
-  });
 
 export type signUpFormValues = z.infer<typeof signUpFormSchema>
+const baseUrl = "https://member-management-backend.vercel.app/users";
 
-export type signInFormValues = z.infer<typeof signInFormSchema>
+
 
 const signUpForm  = useForm<signUpFormValues>({
     resolver: zodResolver(signUpFormSchema),
@@ -44,25 +43,33 @@ const signUpForm  = useForm<signUpFormValues>({
     },
     })
 
-    const signInForm = useForm<signInFormValues>({
-        resolver: zodResolver(signInFormSchema),
-        defaultValues: {
-            email: "",
-            password: "",
-        },
-    })
+const SignUpForm = () => {
+
+    const {registerUser} = useAuth();
+    const [formData, setFormData] = useState<signUpFormValues | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const signUpSubmit = async (values: signUpFormValues ) => {
-        console.log(values)
+        try{
+            const response = await fetch(`${baseUrl}/users`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values),
+        });
+        if (response.ok) {
+            const { token, userId } = await response.json();
+            registerUser(userId, token);
+        } else {
+            const { error } = await response.json();
+            console.log(error);
+        }       
+    }catch (error) {
+        console.log(error);
+    }finally {
+        setLoading(false);
     }
-
-    const signInSubmit = async (values: signInFormValues ) => {
-        console.log(values)
-    }
-
-export const SignUpForm = () => {
-
-    return (
+}
+ return (
         <Form {...signUpForm}>
         < form onSubmit={signUpForm.handleSubmit(signUpSubmit)}>
             <FormField control={signUpForm.control} name="username" render={({ field }) => (
@@ -98,37 +105,8 @@ export const SignUpForm = () => {
         </form>
         </Form>
     )
+
+   
 }
 
-export const SignInForm = () => {
-    return (
-        <Form {...signInForm}>
-        <form onSubmit={signInForm.handleSubmit(signInSubmit)}>
-            <FormField control={signInForm.control} name="email" render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                        <Input placeholder="email" {...field} />
-                    </FormControl>
-                </FormItem>
-            )} >
-                </FormField>
-            <FormField control={signInForm.control} name="password" render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                        <Input type="password" placeholder="password" {...field} />
-                    </FormControl>
-                </FormItem>
-            )} >
-                </FormField>
-            <Button type="submit">Submit</Button>
-        </form>
-        </Form>
-    )
-}
-
-
-
-
-
+export default SignUpForm;

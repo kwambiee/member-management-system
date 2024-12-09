@@ -1,8 +1,13 @@
+"use client"
+import { useState, useEffect, Dispatch } from "react";
+import { useRouter } from "next/navigation";
 import { Profile, columns } from "../../components/ui/columns"
 import { DataTable } from "./data-table"
 import MembershipChart from "./chart"
 import StatisticCard from "./statistics"
 import ActivityLogs from "./activity-logs"
+import { useAuth } from "@/context"
+
 
  export async function getData(): Promise<Profile[]> {
   // Fetch data from your API here.
@@ -160,8 +165,19 @@ import ActivityLogs from "./activity-logs"
   ]
 }
 
-export default async function DemoPage() {
-  const data = await getData()
+const Dashboard = async() => {
+  const data = await getData();
+
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) return null;
 
   return (
     <div className="container mx-auto py-10">
@@ -179,3 +195,5 @@ export default async function DemoPage() {
     </div>
   )
 }
+
+export default Dashboard;
